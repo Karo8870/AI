@@ -1,0 +1,112 @@
+Cunoașterea relațiilor dintre variabilele dintr-un set de date este esențială pentru construirea unui model de predicție precis. Dacă ai identificat o relație liniară între preț și anul în care a fost construită casa, poți utiliza aceste informații în mai multe moduri pentru a îmbunătăți modelul tău. Iată câteva moduri în care această cunoaștere poate fi valorificată:
+
+### 1. *Selecția Feature-urilor Relevante*
+
+Includerea variabilelor relevante care au o relație clară cu variabila țintă (în acest caz, prețul) poate îmbunătăți performanța modelului. Dacă știi că anul construcției este un predictor important pentru preț, asigură-te că această variabilă este inclusă în setul de date pentru antrenarea modelului.
+
+### 2. *Ingineria Feature-urilor*
+
+Pe lângă includerea variabilelor relevante, poți crea noi feature-uri care capturează mai bine relația dintre variabile. De exemplu, poți crea feature-uri derivate, cum ar fi vârsta casei (de la construcție până în prezent):
+
+python
+import pandas as pd
+
+# Presupunem că avem un dataframe `df` cu coloanele `YearBuilt` și `SalePrice`
+df['HouseAge'] = 2024 - df['YearBuilt']
+
+
+### 3. *Modelare Liniară și Simplificare*
+
+Dacă relația dintre preț și anul construcției este liniară, un model de regresie liniară poate fi foarte eficient. Poți începe prin antrenarea unui model de regresie liniară simplu pentru a evalua această relație:
+
+python
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+# Selectăm feature-ul relevant și variabila țintă
+X = df[['HouseAge']]
+y = df['SalePrice']
+
+# Împărțim datele în seturi de antrenament și testare
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Antrenăm modelul de regresie liniară
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluăm modelul
+y_pred = model.predict(X_test)
+from sklearn.metrics import mean_squared_error, r2_score
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R^2 Score:", r2_score(y_test, y_pred))
+
+
+### 4. *Polinomial Features și Relații Non-Liniare*
+
+Dacă există o relație non-liniară între variabile, poți folosi feature-uri polinomiale pentru a capta această relație:
+
+python
+from sklearn.preprocessing import PolynomialFeatures
+
+# Creăm feature-uri polinomiale
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+
+# Împărțim datele și antrenăm modelul de regresie liniară pe noile feature-uri
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluăm modelul
+y_pred = model.predict(X_test)
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R^2 Score:", r2_score(y_test, y_pred))
+
+
+### 5. *Feature Scaling*
+
+Pentru unele modele, scalarea feature-urilor poate îmbunătăți performanța. De exemplu, scalarea variabilei HouseAge poate fi benefică pentru modele care sunt sensibile la magnitudinea feature-urilor, cum ar fi SVM sau rețelele neuronale.
+
+python
+from sklearn.preprocessing import StandardScaler
+
+# Scalăm datele
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Împărțim datele și antrenăm modelul
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluăm modelul
+y_pred = model.predict(X_test)
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R^2 Score:", r2_score(y_test, y_pred))
+
+
+### 6. *Feature Interaction*
+
+În unele cazuri, interacțiunile dintre variabile pot îmbunătăți performanța modelului. De exemplu, poate fi util să explorezi interacțiunile dintre HouseAge și alte variabile, cum ar fi dimensiunea casei sau locația.
+
+python
+# Creăm interacțiuni între variabile
+df['HouseAge_LivingArea'] = df['HouseAge'] * df['LivingArea']
+
+# Antrenăm un model folosind feature-uri noi
+X = df[['HouseAge', 'LivingArea', 'HouseAge_LivingArea']]
+y = df['SalePrice']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Evaluăm modelul
+y_pred = model.predict(X_test)
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R^2 Score:", r2_score(y_test, y_pred))
+
+
+### Concluzie
+
+Cunoașterea relațiilor dintre variabile îți permite să faci feature engineering eficient, să selectezi modele adecvate și să îmbunătățești performanța modelului prin tehnici de preprocesare și transformare a datelor. Aplicarea acestor cunoștințe în mod strategic poate duce la obținerea unor predicții mai precise și a unui model mai robust.
